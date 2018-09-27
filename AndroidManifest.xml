@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="gordey007.nfc">
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.NFC" />
-    <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -19,38 +17,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
 
-                <intent-filter>
-                    <action android:name="android.nfc.action.TECH_DISCOVERED" />
-                    <category android:name="android.intent.category.DEFAULT" />
-                </intent-filter>
-
-                <meta-data
-                    android:name="android.nfc.action.TECH_DISCOVERED"
-                    android:resource="@xml/nfc_tech_filter" />
-
-                <intent-filter>
-                    <action android:name="android.nfc.action.TAG_DISCOVERED" />
-                    <category android:name="android.intent.category.DEFAULT" />
-                </intent-filter>
-
             </intent-filter>
         </activity>
 
-        <activity android:name=".TimeActivity">
-
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.nfc.action.TECH_DISCOVERED"
-                android:resource="@xml/nfc_tech_filter" />
-
-            <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+        <activity android:name=".DBNFCActivity">
 
 
         </activity>

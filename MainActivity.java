@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_log_in:
-                Intent intent = new Intent(this, TimeActivity.class);
+                Intent intent = new Intent(this, DBNFCActivity.class);
                 startActivity(intent);
                 break;
         }
