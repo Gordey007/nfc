@@ -20,9 +20,11 @@ import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class DBNFCActivity extends AppCompatActivity implements View.OnClickListener{
@@ -33,6 +35,10 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
     EditText etID;
 
     TextView tvSerialNumber;
+
+    LinearLayout listNumbers;
+
+    int wrapContent = LinearLayout.LayoutParams.WRAP_CONTENT;
 
     DBHelper dbHelper;
 
@@ -75,9 +81,10 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
 
         etID = (EditText) findViewById(R.id.etID);
 
+        listNumbers = (LinearLayout) findViewById(R.id.listNumbers);
+
         // создаем объект для создания и управления версиями БД
         dbHelper = new DBHelper(this);
-
     }
 
     @Override
@@ -142,6 +149,22 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
 
         switch (v.getId()) {
             case R.id.btnAdd:
+
+                //Создание LayoutParams c шириной и высотой по содержимому
+                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(wrapContent, wrapContent);
+                // переменная для хранения значения выравнивания
+                // по умолчанию пусть будет LEFT
+                int btnGravity = Gravity.LEFT;
+                // переносим полученное значение выравнивания в LayoutParams
+                lParams.gravity = btnGravity;
+
+                // создаем TextView, пишем текст и добавляем в LinearLayout
+                TextView txtNew = new TextView(this);
+                txtNew.setText(etID.getText().toString() + " - " + tvSerialNumber.getText().toString());
+                txtNew.setTextColor(0xff66ff00);
+                txtNew.setTextSize(18);
+                listNumbers.addView(txtNew, lParams);
+
                 Log.d(LOG_TAG, "--- Insert in mytable: ---");
                 // подготовим данные для вставки в виде пар: наименование столбца - значение
                 cv.put("id", idtxt);
@@ -152,6 +175,7 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.btnRead:
+
                 Log.d(LOG_TAG, "--- Rows in mytable: ---");
                 // делаем запрос всех данных из таблицы mytable, получаем Cursor
                 Cursor c = db.query("mytable", null, null, null, null, null, null);
@@ -178,7 +202,6 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.btnClear:
-
                 Log.d(LOG_TAG, "--- Clear mytable: ---");
                 // удаляем все записи
                 int clearCount = db.delete("mytable", null, null);

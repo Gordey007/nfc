@@ -1,5 +1,6 @@
 package gordey007.nfc;
 
+
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,14 +14,27 @@ import android.nfc.tech.NfcB;
 import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class TimeActivity extends AppCompatActivity {
+public class TimeActivity extends AppCompatActivity implements View.OnClickListener{
 
-    TextView text;
+    private Chronometer mChronometer;
 
-    // list of NFC technologies detected:
+    String key = "";
+
+    Button start, stop, reset;
+
+    LinearLayout listResults;
+
+    int wrapContent = LinearLayout.LayoutParams.WRAP_CONTENT;
+
     private final String[][] techList = new String[][] {
             new String[] {
                     NfcA.class.getName(),
@@ -38,8 +52,26 @@ public class TimeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.time);
 
-        text = (TextView) findViewById(R.id.text);
+        mChronometer = (Chronometer) findViewById(R.id.chronometer);
 
+        start = (Button) findViewById(R.id.start);
+        start.setOnClickListener(this);
+
+        stop = (Button) findViewById(R.id.stop);
+        stop.setOnClickListener(this);
+
+        reset = (Button) findViewById(R.id.reset);
+        reset.setOnClickListener(this);
+
+        listResults = (LinearLayout) findViewById(R.id.listResults);
+
+        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
+
+            }
+        });
     }
 
     @Override
@@ -68,9 +100,24 @@ public class TimeActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         if (intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)) {
-            ((TextView)findViewById(R.id.text)).setText(
-                    "NFC Tag (serial number)\n" +
-                            ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)));
+            showElapsedTime();
+
+            key = (ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)));
+            //Создание LayoutParams c шириной и высотой по содержимому
+            LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(wrapContent, wrapContent);
+            // переменная для хранения значения выравнивания
+            // по умолчанию пусть будет LEFT
+            int btnGravity = Gravity.LEFT;
+            // переносим полученное значение выравнивания в LayoutParams
+            lParams.gravity = btnGravity;
+
+            // создаем TextView, пишем текст и добавляем в LinearLayout
+            TextView txtNew = new TextView(this);
+
+            txtNew.setText(key.toString() + " - " + showElapsedTime());
+            txtNew.setTextColor(0xff66ff00);
+            txtNew.setTextSize(18);
+            listResults.addView(txtNew, lParams);
         }
     }
 
@@ -90,17 +137,45 @@ public class TimeActivity extends AppCompatActivity {
         return out;
     }
 
+    public void onStartClick(View view) {
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+        mChronometer.start();
+    }
+
+    public void onStopClick(View view) {
+        mChronometer.stop();
+    }
+
+    public void onResetClick(View view) {
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+    }
+
+    private String showElapsedTime() {
+        String time = null;
+        long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
+        // elapsedMillis = elapsedMillis / 3600;
+      //  Toast.makeText(TimeActivity.this, "Elapsed milliseconds: " + elapsedMillis, Toast.LENGTH_SHORT).show();
+
+        time = String.format("%02d:%02d:%02d", elapsedMillis / 1000 / 3600, elapsedMillis / 1000 / 60 % 60, elapsedMillis / 1000 % 60);
+
+        return time;
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.start:
+                onStartClick(v);
+                break;
+            case R.id.stop:
+                onStopClick(v);
+                break;
+            case R.id.reset:
+                onResetClick(v);
+                break;
+
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
