@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.nfc.NfcAdapter;
@@ -26,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DBNFCActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -70,9 +70,6 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
 
         btnAdd = (Button) findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(this);
-
-        btnRead = (Button) findViewById(R.id.btnRead);
-        btnRead.setOnClickListener(this);
 
         btnClear = (Button) findViewById(R.id.btnClear);
         btnClear.setOnClickListener(this);
@@ -145,35 +142,43 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
         String idtxt = etID.getText().toString();
 
         // подключаемся к БД
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+       // SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         switch (v.getId()) {
             case R.id.btnAdd:
 
-                //Создание LayoutParams c шириной и высотой по содержимому
-                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(wrapContent, wrapContent);
-                // переменная для хранения значения выравнивания
-                // по умолчанию пусть будет LEFT
-                int btnGravity = Gravity.LEFT;
-                // переносим полученное значение выравнивания в LayoutParams
-                lParams.gravity = btnGravity;
+                if ((etID.getText().toString().length() < 1) || (tvSerialNumber.getText().toString().length() < 1)) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Вы забыли ID или серийный номер NFC метки", Toast.LENGTH_SHORT);
+                    toast.show();
+                }else {
 
-                // создаем TextView, пишем текст и добавляем в LinearLayout
-                TextView txtNew = new TextView(this);
-                txtNew.setText(etID.getText().toString() + " - " + tvSerialNumber.getText().toString());
-                txtNew.setTextColor(0xff66ff00);
-                txtNew.setTextSize(18);
-                listNumbers.addView(txtNew, lParams);
+                    //Создание LayoutParams c шириной и высотой по содержимому
+                    LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(wrapContent, wrapContent);
+                    // переменная для хранения значения выравнивания
+                    // по умолчанию пусть будет LEFT
+                    int btnGravity = Gravity.LEFT;
+                    // переносим полученное значение выравнивания в LayoutParams
+                    lParams.gravity = btnGravity;
 
-                Log.d(LOG_TAG, "--- Insert in mytable: ---");
-                // подготовим данные для вставки в виде пар: наименование столбца - значение
-                cv.put("id", idtxt);
-                cv.put("name", name);
-                // вставляем запись и получаем ее ID
-                long rowID = db.insert("mytable", null, cv);
-                Log.d(LOG_TAG, "row inserted, ID = " + rowID);
+                    // создаем TextView, пишем текст и добавляем в LinearLayout
+                    TextView txtNew = new TextView(this);
+                    txtNew.setText(etID.getText().toString() + " - " + tvSerialNumber.getText().toString());
+                    txtNew.setTextColor(0xff000000);
+                    txtNew.setTextSize(18);
+                    listNumbers.addView(txtNew, lParams);
+
+                    etID.getText().clear();
+
+                    Log.d(LOG_TAG, "--- Insert in mytable: ---");
+                    // подготовим данные для вставки в виде пар: наименование столбца - значение
+                    //  cv.put("id", idtxt);
+                    //  cv.put("name", name);
+                    // вставляем запись и получаем ее ID
+                    //   long rowID = db.insert("mytable", null, cv);
+                    //    Log.d(LOG_TAG, "row inserted, ID = " + rowID);
+                }
                 break;
-
+/*
             case R.id.btnRead:
 
                 Log.d(LOG_TAG, "--- Rows in mytable: ---");
@@ -200,12 +205,14 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
                     Log.d(LOG_TAG, "0 rows");
                 c.close();
                 break;
-
+*/
             case R.id.btnClear:
-                Log.d(LOG_TAG, "--- Clear mytable: ---");
+               // Log.d(LOG_TAG, "--- Clear mytable: ---");
                 // удаляем все записи
-                int clearCount = db.delete("mytable", null, null);
-                Log.d(LOG_TAG, "deleted rows count = " + clearCount);
+                // int clearCount = db.delete("mytable", null, null);
+                // Log.d(LOG_TAG, "deleted rows count = " + clearCount);
+
+                listNumbers.removeAllViews();
 
                 // db.execSQL("DROP TABLE IF EXISTS mytable");
                 //DBHelper.deleteDatabase("mytable");
@@ -220,9 +227,8 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
                 cv.put("name", name);
 
                 // обновляем по id
-                int updCount = db.update("mytable", cv, "id = ?",
-                        new String[] { idtxt });
-                Log.d(LOG_TAG, "updated rows count = " + updCount);
+             //   int updCount = db.update("mytable", cv, "id = ?", new String[] { idtxt });
+              //  Log.d(LOG_TAG, "updated rows count = " + updCount);
                 break;
 
             case R.id.btnDel:
@@ -231,8 +237,8 @@ public class DBNFCActivity extends AppCompatActivity implements View.OnClickList
                 }
                 Log.d(LOG_TAG, "--- Delete from mytable: ---");
                 // удаляем по id
-                int delCount = db.delete("mytable", "id = " + idtxt, null);
-                Log.d(LOG_TAG, "deleted rows count = " + delCount);
+               // int delCount = db.delete("mytable", "id = " + idtxt, null);
+             //   Log.d(LOG_TAG, "deleted rows count = " + delCount);
                 break;
         }
 

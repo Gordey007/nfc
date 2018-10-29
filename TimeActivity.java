@@ -14,14 +14,17 @@ import android.nfc.tech.NfcB;
 import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TimeActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -29,9 +32,14 @@ public class TimeActivity extends AppCompatActivity implements View.OnClickListe
 
     String key = "";
 
-    Button start, stop, reset;
+   // Button start, stop;
+
+    EditText checkpoint;
 
     LinearLayout listResults;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    String currentDateandTime = sdf.format(new Date());
 
     int wrapContent = LinearLayout.LayoutParams.WRAP_CONTENT;
 
@@ -54,24 +62,23 @@ public class TimeActivity extends AppCompatActivity implements View.OnClickListe
 
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
 
-        start = (Button) findViewById(R.id.start);
-        start.setOnClickListener(this);
+       // start = (Button) findViewById(R.id.start);
+       // start.setOnClickListener(this);
 
-        stop = (Button) findViewById(R.id.stop);
-        stop.setOnClickListener(this);
+       // stop = (Button) findViewById(R.id.stop);
+       // stop.setOnClickListener(this);
 
-        reset = (Button) findViewById(R.id.reset);
-        reset.setOnClickListener(this);
+        checkpoint = (EditText) findViewById(R.id.checkpoint);
 
         listResults = (LinearLayout) findViewById(R.id.listResults);
 
-        mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+      /*  mChronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
                 long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
 
             }
-        });
+        });*/
     }
 
     @Override
@@ -100,7 +107,7 @@ public class TimeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onNewIntent(Intent intent) {
         if (intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)) {
-            showElapsedTime();
+          //  showElapsedTime();
 
             key = (ByteArrayToHexString(intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)));
             //Создание LayoutParams c шириной и высотой по содержимому
@@ -111,13 +118,19 @@ public class TimeActivity extends AppCompatActivity implements View.OnClickListe
             // переносим полученное значение выравнивания в LayoutParams
             lParams.gravity = btnGravity;
 
-            // создаем TextView, пишем текст и добавляем в LinearLayout
-            TextView txtNew = new TextView(this);
+            if (checkpoint.getText().toString().length() < 1) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Вы забыли ID или серийный номер NFC метки", Toast.LENGTH_SHORT);
+                toast.show();
+            }else {
 
-            txtNew.setText(key.toString() + " - " + showElapsedTime());
-            txtNew.setTextColor(0xff66ff00);
-            txtNew.setTextSize(18);
-            listResults.addView(txtNew, lParams);
+                // создаем TextView, пишем текст и добавляем в LinearLayout
+                TextView txtNew = new TextView(this);
+
+                txtNew.setText(checkpoint.getText().toString() + " - " + key.toString() + " - " + currentDateandTime.toString());
+                txtNew.setTextColor(0xff000000);
+                txtNew.setTextSize(18);
+                listResults.addView(txtNew, lParams);
+            }
         }
     }
 
@@ -137,7 +150,7 @@ public class TimeActivity extends AppCompatActivity implements View.OnClickListe
         return out;
     }
 
-    public void onStartClick(View view) {
+  /*  public void onStartClick(View view) {
         mChronometer.setBase(SystemClock.elapsedRealtime());
         mChronometer.start();
     }
@@ -146,35 +159,23 @@ public class TimeActivity extends AppCompatActivity implements View.OnClickListe
         mChronometer.stop();
     }
 
-    public void onResetClick(View view) {
-        mChronometer.setBase(SystemClock.elapsedRealtime());
-    }
-
     private String showElapsedTime() {
         String time = null;
         long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
-        // elapsedMillis = elapsedMillis / 3600;
-      //  Toast.makeText(TimeActivity.this, "Elapsed milliseconds: " + elapsedMillis, Toast.LENGTH_SHORT).show();
-
         time = String.format("%02d:%02d:%02d", elapsedMillis / 1000 / 3600, elapsedMillis / 1000 / 60 % 60, elapsedMillis / 1000 % 60);
 
         return time;
-
     }
-
-
+*/
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.start:
-                onStartClick(v);
-                break;
-            case R.id.stop:
-                onStopClick(v);
-                break;
-            case R.id.reset:
-                onResetClick(v);
-                break;
+           // case R.id.start:
+           //     onStartClick(v);
+           //     break;
+          //  case R.id.stop:
+           //     onStopClick(v);
+           //     break;
 
         }
     }
